@@ -1,0 +1,39 @@
+# Program Name: Program A.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Assignment Number: Assignment 4
+# Due Date: 11/6/26
+# Purpose: We are to send our upper and lower ase messages through Program A and B.
+# Resources: Personal tutor/ Mentor
+
+import socket
+
+#   Start with configuring the server IP address
+server_ip = "127.0.0.1"
+server_port = 41117
+
+# Create the TCP socket
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+try:
+    # Connecting to program B
+    client_socket.connect((server_ip, server_port))
+
+    # Ask the user to enter a message
+    user_message = input("Enter your message: ")
+
+    # Send that message to Program B
+    client_socket.sendall(user_message.encode("utf-8"))
+
+    # Receive the uppercase response
+    response = client_socket.recv(4096).decode("utf-8")
+
+    # Show that response
+    print("Response from Program B:", response)
+
+except OSError as error:
+    print("Connection error:", error)
+
+finally:
+    # End the connection
+    client_socket.close()

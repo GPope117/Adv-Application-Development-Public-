@@ -1,0 +1,39 @@
+# Menu program: Assignment2.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Lab 2
+# Purpose: Read the 6 scores of the students and calculate the highest average. Print highest to lowest to highest averages.
+#https://github.com/GPope117/-Adv-Application-Development-Assignments
+
+from pathlib import Path
+
+
+def main():
+    # Where is are input file?
+    input_path = Path(__file__).resolve().parent / "Assignment2input.txt"
+    student_results = []
+
+    # Read every score in the file and list the averages lowest to highest.
+    with input_path.open("r", encoding="utf-8") as input_file:
+        for line in input_file:
+            if not line.strip():
+                continue
+
+            fields = line.split()
+            student_name = fields[0]
+            scores = [int(value) for value in fields[1:]]
+
+            # Calculate and store the average without rounding it yet.
+            average = sum(scores) / len(scores)
+            student_results.append((student_name, average))
+
+# Sort by the average in descending order.
+    student_results.sort(key=lambda student: student[1], reverse=True)
+
+    # Display each name and average with exactly two decimal places.
+    for student_name, average in student_results:
+        print(f"{student_name} {average:.2f}")
+
+
+if __name__ == "__main__":
+    main()

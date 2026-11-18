@@ -1,0 +1,55 @@
+# Program Name: Program B.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Assignment Number: Assignment 4
+# Due Date: 11/6/26
+# Purpose: We are to receive the message from Program B and turn it into uppercase letters.
+# More over send those results back.
+# Resources: Personal tutor/ Mentor
+
+import socket
+
+# Configure the server IP address and port
+server_ip = "127.0.0.1"
+server_port = 41117
+
+# Create a TCP socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+try:
+    # Allowing port reuse
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    # Connect the server Ip address and port for communicating
+    server_socket.bind((server_ip, server_port))
+
+    # Locate connections
+    server_socket.listen(1)
+
+    print("Program B is establishing a connection...")
+
+    # Accept a connection from Program A
+    connection, client_address = server_socket.accept()
+
+    with connection:
+        print("Connected to:", client_address)
+
+        # Receive the message
+        received_message = connection.recv(4096).decode("utf-8")
+
+        print("Received message:", received_message)
+
+        # Turn message to uppercase
+        uppercase_message = received_message.upper()
+
+        # Send the uppercase message back
+        connection.sendall(uppercase_message.encode("utf-8"))
+
+        print("Sent response:", uppercase_message)
+
+except OSError as error:
+    print("Server error:", error)
+
+finally:
+    # Close the server socket
+    server_socket.close()

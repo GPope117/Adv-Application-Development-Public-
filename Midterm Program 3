@@ -1,0 +1,30 @@
+# Menu program: Midterm Program 3.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Midterm
+# Purpose: We will check possible divisor and continuosly do so.
+# GitHub: https://github.com/GPope117/-Adv-Application-Development-Assignments
+
+from pathlib import Path
+
+
+def main():
+    file_path = Path(__file__).resolve().parent / "p2.txt"
+
+    with file_path.open("r", encoding="utf-8") as file:
+        data = [int(line) for line in file if line.strip()]
+
+    data.sort(reverse=True)
+
+    duplicates = sum(
+        data[index] == data[index - 1]
+        for index in range(1, len(data))
+    )
+
+    print(len(data), "items")
+    print("Sorted in descending order")
+    print("Found", duplicates, "duplicates")
+
+
+if __name__ == "__main__":
+    main()

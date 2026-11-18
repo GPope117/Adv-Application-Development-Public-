@@ -1,0 +1,34 @@
+# Menu program: Assignment.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Lab 1
+# Purpose: Writing a program that implements a text-based meni. The menu should present the user with the following choices: Append data, clear input, display input buffer
+# exit the program.
+input_buffer = ""
+
+while True:
+    print("Option 1: Append data to the input buffer")
+    print("Option 2: Clear the input buffer")
+    print("Option 3: Display the input buffer")
+    print("Option 4: Exit the program")
+
+    choice = input("Enter your choice (1-4): ").strip()
+
+    if choice == "1":
+            new_data = input("Enter a string to append to: ")
+            input_buffer += new_data
+            print("Data appended to the input buffer...")
+
+    elif choice == "2":
+            input_buffer = ""
+            print("Input buffer cleared...")
+
+    elif choice == "3":
+            print (" Input buffer:", input_buffer)
+
+    elif choice == "4":
+            print("Exiting the program")
+            break
+
+    else:
+            print("Invalid choice! Please try 1, 2, 3, or 4 please.....")

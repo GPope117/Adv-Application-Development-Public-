@@ -1,0 +1,188 @@
+# Menu program: Midterm Program 1.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Midterm
+# Purpose: We are assigning colors two tiles at a time. There are odd rows by  odd columns, one tile will remains.
+# Selecting its partner causes it to crash. What needs to be done to fix that is to make one cell into an inactive blank on the odd sized boards.
+# Match tiles are prevented from being clicked over again.
+# GitHub: https://github.com/GPope117/-Adv-Application-Development-Assignments
+
+import random
+import tkinter as tk
+from tkinter import messagebox
+
+COLORS = ["red", "green", "blue", "cyan", "yellow", "magenta"]
+
+
+class MatchingGame:
+    def __init__(self, root):
+        self.root = root
+        self.rows = 5
+        self.cols = 6
+        self.selected = []
+        self.matched = set()
+        self.pending = None
+        self.remaining = 0
+
+        root.title("Tile Matching Game")
+
+        menu = tk.Menu(root)
+        file_menu = tk.Menu(menu, tearoff=False)
+        file_menu.add_command(label="New Game", command=self.reset_game)
+        file_menu.add_command(label="Options", command=self.options)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=root.destroy)
+        menu.add_cascade(label="File", menu=file_menu)
+        root.config(menu=menu)
+
+        self.board = tk.Frame(root)
+        self.board.pack(padx=10, pady=10)
+
+        self.status = tk.Label(root)
+        self.status.pack(pady=5)
+
+        self.reset_game()
+
+    def reset_game(self):
+        if self.pending is not None:
+            self.root.after_cancel(self.pending)
+            self.pending = None
+
+        for widget in self.board.winfo_children():
+            widget.destroy()
+
+        self.selected = []
+        self.matched = set()
+        self.buttons = {}
+
+        total = self.rows * self.cols
+        playable = total - total % 2
+        self.remaining = playable
+
+        self.tile_colors = []
+        for _ in range(playable // 2):
+            color = random.choice(COLORS)
+            self.tile_colors.extend([color, color])
+
+        random.shuffle(self.tile_colors)
+
+        # An odd-sized board has one inactive blank cell.
+        cells = list(self.tile_colors)
+        if total % 2:
+            cells.insert(random.randrange(total), None)
+
+        self.tile_colors = cells
+
+        for index, color in enumerate(cells):
+            row, col = divmod(index, self.cols)
+
+            if color is None:
+                widget = tk.Label(self.board, text=" ", width=7, height=3)
+            else:
+                widget = tk.Button(
+                    self.board,
+                    text=" ",
+                    width=7,
+                    height=3,
+                    command=lambda i=index: self.reveal(i),
+                )
+                self.buttons[index] = widget
+
+            widget.grid(row=row, column=col, padx=2, pady=2)
+
+        self.update_status()
+
+    def reveal(self, index):
+        if (
+            self.pending is not None
+            or index in self.matched
+            or index in self.selected
+        ):
+            return
+
+        self.buttons[index].config(
+            bg=self.tile_colors[index], relief=tk.SUNKEN
+        )
+        self.selected.append(index)
+
+        if len(self.selected) == 2:
+            self.pending = self.root.after(1000, self.check_match)
+
+    def check_match(self):
+        self.pending = None
+        first, second = self.selected
+
+        if self.tile_colors[first] == self.tile_colors[second]:
+            for index in self.selected:
+                self.matched.add(index)
+                self.buttons[index].config(
+                    state=tk.DISABLED,
+                    bg="black",
+                    relief=tk.RAISED,
+                )
+            self.remaining -= 2
+        else:
+            for index in self.selected:
+                self.buttons[index].config(
+                    bg=self.default_background,
+                    relief=tk.RAISED,
+                )
+
+        self.selected = []
+        self.update_status()
+
+    @property
+    def default_background(self):
+        return self.root.cget("bg")
+
+    def update_status(self):
+        if self.remaining == 0:
+            self.status.config(text="Game complete!")
+        else:
+            self.status.config(
+                text=f"Pairs remaining: {self.remaining // 2}"
+            )
+
+    def options(self):
+        window = tk.Toplevel(self.root)
+        window.title("Options")
+
+        tk.Label(window, text="Rows").grid(row=0, column=0, padx=10, pady=5)
+        tk.Label(window, text="Columns").grid(row=1, column=0, padx=10, pady=5)
+
+        rows_entry = tk.Entry(window)
+        cols_entry = tk.Entry(window)
+        rows_entry.grid(row=0, column=1, padx=10, pady=5)
+        cols_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        rows_entry.insert(0, str(self.rows))
+        cols_entry.insert(0, str(self.cols))
+
+        def save():
+            try:
+                rows = int(rows_entry.get())
+                cols = int(cols_entry.get())
+                if rows <= 0 or cols <= 0:
+                    raise ValueError
+            except ValueError:
+                messagebox.showerror(
+                    "Invalid dimensions",
+                    "Enter positive whole numbers.",
+                    parent=window,
+                )
+                return
+
+            self.rows = rows
+            self.cols = cols
+            self.reset_game()
+            window.destroy()
+
+        tk.Button(window, text="Save", command=save).grid(
+            row=2, column=0, columnspan=2, pady=10
+        )
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    game = MatchingGame(root)
+    root.mainloop()

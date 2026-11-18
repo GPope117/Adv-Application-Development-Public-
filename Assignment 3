@@ -1,0 +1,88 @@
+
+# Menu program: Assignment.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Lab 2
+# Purpose: Create a graphical user interface that converts
+# miles per gallon to kilometers per liter.
+# GitHub: https://github.com/GPope117/-Adv-Application-Development-Assignments
+
+import math
+import tkinter as tk
+from tkinter import ttk
+
+# Converting miles per gallon to kilometers per liter.
+MPG_TO_KM_PER_LITER = 0.425144
+
+
+def convert_mpg(text):
+    """Return a formatted result or a helpful message for invalid input."""
+
+    # Have a blank entry which is the value of what is being converted.
+    if not text.strip():
+        return "Enter miles per gallon above."
+
+    # Convert what is being entered and find any misspellings or typos.
+    try:
+        mpg = float(text)
+    except ValueError:
+        return "Please enter a valid number."
+
+    # Reject any negative values, infinite numbers, and invalid inputs.
+    if not math.isfinite(mpg) or mpg < 0:
+        return "Please enter a finite, non-negative number."
+
+    # Multiply by the conversion factor and display four decimal places.
+    return f"{mpg * MPG_TO_KM_PER_LITER:.4f} km/L"
+
+
+def main():
+    # Create the window for the application with a fixed size.
+    root = tk.Tk()
+    root.title("MPG to Kilometers per Liter Converter")
+    root.geometry("400x180")
+    root.resizable(False, False)
+
+    # Group the widgets in a frame within a grid.
+    frame = ttk.Frame(root, padding=24)
+    frame.grid(row=0, column=0, sticky="nsew")
+
+    # StringVar connects the input and result text to the GUI widgets.
+    mpg_text = tk.StringVar()
+    result_text = tk.StringVar()
+
+    # Create a label and entry for miles per gallon.
+    ttk.Label(frame, text="Miles per gallon:").grid(
+        row=0, column=0, sticky="w", pady=5
+    )
+
+    entry = ttk.Entry(frame, textvariable=mpg_text, width=20)
+    entry.grid(row=0, column=1, pady=5)
+
+    # Show what is converted or a validation message.
+    ttk.Label(frame, text="Kilometers per liter:").grid(
+        row=1, column=0, sticky="w", pady=5
+    )
+
+    ttk.Label(frame, textvariable=result_text).grid(
+        row=1, column=1, sticky="w", pady=5
+    )
+
+    def update_result(*_):
+        # Read the current entry and refresh the result.
+        result_text.set(convert_mpg(mpg_text.get()))
+
+    # Run the callback whenever the entry changes.
+    mpg_text.trace_add("write", update_result)
+
+    # Update the interface.
+    update_result()
+    entry.focus_set()
+
+    # Start the graphical user interface.
+    root.mainloop()
+
+
+# Launch the GUI only when the file is running.
+if __name__ == "__main__":
+    main()

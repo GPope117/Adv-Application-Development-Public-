@@ -1,0 +1,33 @@
+# Menu program: Midterm Program 2.py
+# Course: IT3883/Section 1
+# Gabriel Pope
+# Midterm
+# Purpose: We are fixing thr sorting/loop boundary. The sort is showing the list in ascending order, but we need it to desced.
+# We'll use the data.sort(reverse=True). There is an out-of-range error with the final item.
+# The goal is to stop the loop before it arrives to last item and count the equal values.
+# GitHub: https://github.com/GPope117/-Adv-Application-Development-Assignments
+
+
+from pathlib import Path
+
+
+def main():
+    file_path = Path(__file__).resolve().parent / "p2.txt"
+
+    with file_path.open("r", encoding="utf-8") as file:
+        data = [int(line) for line in file if line.strip()]
+
+    data.sort(reverse=True)
+
+    duplicates = sum(
+        data[index] == data[index - 1]
+        for index in range(1, len(data))
+    )
+
+    print(len(data), "items")
+    print("Sorted in descending order")
+    print("Found", duplicates, "duplicates")
+
+
+if __name__ == "__main__":
+    main()
